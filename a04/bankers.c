@@ -12,11 +12,26 @@ Version: 2021-07-26
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <pthread.h>
 
-int main()
+int exit(*available, **max, **allocation, **need);
+int safetyAlgorithm(*available, **max, **allocation, **need);
+int request(*available, **max, **alocation, **need);
+int release(*available, **max, **alocation, **need);
+void status(*available, **max, **alocation, **need);
+int main(int argc, char *argv[]);
+
 {
-    
+	int available[argc - 1];
+	for (i = 0; i < argc; i++){
+		char *c;
+                int num = strtol(argv[i + 1], &c, 10);
+                available[i] = num;
+
+	}
+	
 
 
 
 }
+
