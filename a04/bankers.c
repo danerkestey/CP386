@@ -14,24 +14,39 @@ Version: 2021-07-26
 #include <unistd.h>
 #include <pthread.h>
 
-int exit(*available, **max, **allocation, **need);
-int safetyAlgorithm(*available, **max, **allocation, **need);
-int request(*available, **max, **alocation, **need);
-int release(*available, **max, **alocation, **need);
-void status(*available, **max, **alocation, **need);
-int main(int argc, char *argv[]);
+int exit(int *available, int **max, int **allocation, int **need);
+int safetyAlgorithm(int *available, int **max, int **allocation, int **need);
+int request(int *available, int **max, int **allocation, int **need);
+int release(int *available, int **max, int **allocation, int **need);
+void status(int *available, int **max, int **allocation, int **need);
 
+int main(int argc, char *argv[])
 {
-	int available[argc - 1];
-	for (i = 0; i < argc; i++){
-		char *c;
-                int num = strtol(argv[i + 1], &c, 10);
-                available[i] = num;
-
-	}
-	
-
-
-
+    int available[argc - 1];
+    for (int i = 0; i < argc; i++)
+    {
+        char *c;
+        int num = strtol(argv[i + 1], &c, 10);
+        available[i] = num;
+    }
 }
 
+int exit(int *available, int **max, int **allocation, int **need)
+{
+}
+
+int safetyAlgorithm(int *available, int **max, int **allocation, int **need)
+{
+}
+
+int request(int *available, int **max, int **allocation, int **need)
+{
+}
+
+int release(int *available, int **max, int **allocation, int **need)
+{
+}
+
+void status(int *available, int **max, int **allocation, int **need)
+{
+}
