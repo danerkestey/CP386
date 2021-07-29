@@ -15,24 +15,25 @@ Version: 2021-07-26
 #include <sys/types.h>
 #include <unistd.h>
 #include <pthread.h>
-#include<string.h>
+#include <string.h>
 /*  FUNCTION DECLARATIONS   */
 
 //int exit(int *available, int **max, int **allocation, int **need);
-typedef struct customer{
-	int *allocation;
-	int *max;
-	int *need;
+typedef struct customer
+{
+    int *allocation;
+    int *max;
+    int *need;
 } customer;
 
-int safetyAlgorithm(int *available, int **max, int **allocation, int **need);
+int safetyAlgorithm(int *available, int **max, int **allocation, int **need, int n, int m);
 int request(int *available, int **max, int **allocation, int **need);
 int release(int *available, int **max, int **allocation, int **need);
 void status(int *available, int **max, int **allocation, int **need);
 int isdigit();
-int *arraySplitter(char* line);
+int *arraySplitter(char *line);
 int *fileStats();
-int lineLength(char* line);
+int lineLength(char *line);
 
 struct customer *customers;
 int customerCount = 0;
@@ -85,58 +86,64 @@ int *fileStats()
     return stats;
 }
 //function to create a list of all the customers, each customer contains max, allocation, and need
-int fileToCustomer(){
-	//create file, as of right now it will only read from sample4_in.txt
-	FILE *fp = fopen("sample4_in.txt", "r");
-	if(fp == NULL){
-		printf("File: sample4_in.txt does not exist");
-		return 0;
-	}
-	//read the file once to figure out the amount of customers
-	char line[128];
-	while(fgets(line, sizeof(line), fp) != NULL){
-		customerCount++;
-	}
-	//go back to the start of the file using fseek
-	fseek(fp, 0, SEEK_SET);
-	int index = 0;
-	customers = malloc(sizeof(struct customer) * customerCount);
-	//read the relevant info from the file, attach it to a customer, and finally append the customer to the customer list
-	while(fgets(line, sizeof(line), fp) != NULL){
-		struct customer customer;
-		int *array = arraySplitter(line);
-		customer.max = array;
-		customer.allocation = malloc(sizeof(int) * 4);
-		customer.need = array;
-		customers[index] = customer;
-		index++;
-	}
-	fclose(fp);
-	//loop to test if the arrays were filled correctly 
-	
-	for(int i = 0; i < customerCount; i++){
-		for(int k = 0; k < 4; k++){
-			printf("%d", customers[i].max[k]);
-		}
-	}
-	
-	
+int fileToCustomer()
+{
+    //create file, as of right now it will only read from sample4_in.txt
+    FILE *fp = fopen("sample4_in.txt", "r");
+    if (fp == NULL)
+    {
+        printf("File: sample4_in.txt does not exist");
+        return 0;
+    }
+    //read the file once to figure out the amount of customers
+    char line[128];
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        customerCount++;
+    }
+    //go back to the start of the file using fseek
+    fseek(fp, 0, SEEK_SET);
+    int index = 0;
+    customers = malloc(sizeof(struct customer) * customerCount);
+    //read the relevant info from the file, attach it to a customer, and finally append the customer to the customer list
+    while (fgets(line, sizeof(line), fp) != NULL)
+    {
+        struct customer customer;
+        int *array = arraySplitter(line);
+        customer.max = array;
+        customer.allocation = malloc(sizeof(int) * 4);
+        customer.need = array;
+        customers[index] = customer;
+        index++;
+    }
+    fclose(fp);
+    //loop to test if the arrays were filled correctly
+
+    for (int i = 0; i < customerCount; i++)
+    {
+        for (int k = 0; k < 4; k++)
+        {
+            printf("%d", customers[i].max[k]);
+        }
+    }
 }
 //function to turn lines read from the file into an array
-int *arraySplitter(char* line){
-	//create a copy of the input line
-	char *copy = strdup(line);
-	char *token;
-	//initialize an array to store the values
-	int *values = malloc(sizeof(int) * 4);
+int *arraySplitter(char *line)
+{
+    //create a copy of the input line
+    char *copy = strdup(line);
+    char *token;
+    //initialize an array to store the values
+    int *values = malloc(sizeof(int) * 4);
 
-	int index = 0;
-	//for each item in line fill the values array with the correct value
-	while(token = strsep(&copy, ",")){
-		*(values + index) = atoi(token);
-		index++;
-	}
-	return values;
+    int index = 0;
+    //for each item in line fill the values array with the correct value
+    while (token = strsep(&copy, ","))
+    {
+        *(values + index) = atoi(token);
+        index++;
+    }
+    return values;
 }
 /*
 int exit(int *available, int **max, int **allocation, int **need)
@@ -146,9 +153,40 @@ int exit(int *available, int **max, int **allocation, int **need)
 */
 
 //  grant a request, if it does leave the system in a safe state, otherwisewill deny it.
-int safetyAlgorithm(int *available, int **max, int **allocation, int **need)
+int safetyAlgorithm(int *available, int **max, int **allocation, int **need, int n, int m)
 {
-    return 0;
+    //int work[] = available;
+    int work = available;
+    int finish[n - 1];
+
+    //  init process by starting wiht finish array setting equal to false, of size m (size of available)
+    for (int i = 0; i < n; i++)
+    {
+        finish[i] = 0;
+    }
+
+    int flag = 0;
+
+    int numTrue = 0; // used for counting how many items in finish array are true -> if finish[i] = true for all i then safe state
+    int x = 0;       //  for indexing
+    int counter = 0; //  loop iteration counter
+
+    while (counter < n)
+    {
+        if ((finish[x] == 0) && (need[x] <= work))
+        {
+            work = work + allocation[x];
+            finish[x] = 1;
+            numTrue++; //   new true in finish | keep track of how many true in finish array
+        }
+        counter++;
+    }
+
+    if (numTrue == (n - 1)) //  number of true == size of available -> system in safe state
+    {
+        return 1;
+    }
+    return 0; //  system not in safe state
 }
 
 //  return 0 if successful, 01 if unsuccessful
@@ -169,7 +207,7 @@ void status(int *available, int **max, int **allocation, int **need)
 
 int main(int argc, char *argv[])
 {
-    /*
+
     int available[argc - 1];
     for (int i = 0; i < argc; i++)
     {
@@ -177,7 +215,6 @@ int main(int argc, char *argv[])
         int num = strtol(argv[i + 1], &c, 10);
         available[i] = num;
     }
-    */
 
     //  gets number of processes (n) and number of resources (m) from sample4_in.txt
     int *stats;
@@ -187,6 +224,9 @@ int main(int argc, char *argv[])
 
     //printf("\nRows = %d\nCols = %d", n, m);
 
-
     fileToCustomer();
+    printf("\n");
+    int isSafe = safetyAlgorithm(available, customers->max, customers->allocation, customers->need, n, m);
+
+    printf("System safe: %d", isSafe);
 }
