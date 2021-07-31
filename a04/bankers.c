@@ -35,6 +35,9 @@ int *arraySplitter(char *line);
 int *fileStats();
 int lineLength(char *line);
 
+int n; //   number of processes
+int m; //   number of resources
+
 struct customer *customers;
 int customerCount = 0;
 /*
@@ -156,7 +159,7 @@ int exit(int *available, int **max, int **allocation, int **need)
 int safetyAlgorithm(int *available, int **max, int **allocation, int **need, int n, int m)
 {
     //int work[] = available;
-    int work = available;
+    int work = malloc(sizeof(int) * m);
     int finish[n - 1];
 
     //  init process by starting wiht finish array setting equal to false, of size m (size of available)
