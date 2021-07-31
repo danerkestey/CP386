@@ -150,61 +150,6 @@ int *arraySplitter(char *line)
     }
     return values;
 }
-/*
-int exit(int *available, int **max, int **allocation, int **need)
-{
-    return 0;
-}
-*/
-
-/*
-//  grant a request, if it does leave the system in a safe state, otherwisewill deny it.
-int safetyAlgorithm(int *available, int **max, int **allocation, int **need, int n, int m)
-{
-    //int work[] = available;
-
-    int *work;
-    work = (int *)malloc(sizeof(int) * m);
-    for (int i = 0; i < m; i++)
-    {
-        work[i] = available[i];
-    }
-    int finish[n - 1];
-
-    //  init process by starting wiht finish array setting equal to false, of size m (size of available)
-    for (int i = 0; i < n; i++)
-    {
-        finish[i] = 0;
-    }
-
-    int flag = 0;
-
-    int numTrue = 0; //  used for counting how many items in finish array are true -> if finish[i] = true for all i then safe state
-    int x = 0;       //  for indexing
-    int counter = 0; //  total loop iteration counter
-
-    while (counter < n)
-    {
-        if ((finish[x] == 0) && (need[x][counter] <= work[x]))
-        {
-            work[x] = work[x] + allocation[x][counter];
-            finish[x] = 1;
-            numTrue++; //   new true in finish | keep track of how many true in finish array
-        }
-        x++;
-        counter++;
-    }
-
-    if (numTrue == (n - 1)) //  number of true == size of available -> system in safe state
-    {
-        return 1;
-    }
-    return 0; //  system not in safe state
-    
-
-    
-}
-*/
 
 /*
     helper method to sum the values in an int array
@@ -259,9 +204,8 @@ int safety(int *available, int n, int m)
 
     for (int i = 0; i < m; i++) //  loop to init work array to = available
     {
-	printf("\navailable[%d] = %d", i, available[i]);
+
         *(work + i) = available[i];
-	printf("\nwork[%d] = %d", i, work[i]);
     }
     for (int i = 0; i < n; i++) //  init finish[i] to false
     {   
@@ -298,7 +242,7 @@ int safety(int *available, int n, int m)
 
         if (x == n - 1)
         {
-            return 1; //  the system is in a safe state
+            isSafe = 1; //  the system is in a safe state
         }
     }
     return isSafe; //  return final 0 or 1 depending on safe state
@@ -323,33 +267,7 @@ void status(int *available, int **max, int **allocation, int **need)
 int main(int argc, char *argv[])
 {
 
-    int processes[4] = {10, 5, 7, 8};
-
-    int available[argc - 1];
-    // create a 2D array for available, max, and need
-/*
-    int allocation[n][m];
-    int max[n][m];
-    int need[n][m];
-    for (int i = 0; i < n; i++)
-    {
-        for (int k = 0; k < m; k++)
-        {
-            allocation[i][k] = customers[i].allocation[k];
-            printf("%d", customers[i].allocation[k]);
-            max[i][k] = customers[i].max[k];
-            need[i][k] = customers[i].need[k];
-        }
-    }
-
-      DO NOT USE THIS PIECE OF SHIT
-    for (int i = 0; i < argc; i++)
-    {
-        char *c;
-        int num = strtol(argv[i + 1], &c, 10);
-        available[i] = num;
-    }
-    */
+    int processes[4] = {10, 5, 7,8};
 
     //  gets number of processes (n) and number of resources (m) from sample4_in.txt
     int *stats;
