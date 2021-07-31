@@ -16,6 +16,7 @@ Version: 2021-07-26
 #include <unistd.h>
 #include <pthread.h>
 #include <string.h>
+
 /*  FUNCTION DECLARATIONS   */
 
 //int exit(int *available, int **max, int **allocation, int **need);
@@ -28,9 +29,9 @@ typedef struct customer
 } customer;
 
 int safety(int *available, int n, int m);
-int request(int *available, int **max, int **allocation, int **need);
+int request(int id, int *rq);
 int release(int *available, int **max, int **allocation, int **need);
-void status(int *available, int **max, int **allocation, int **need);
+void status(int *available, int n, int m);
 int isdigit();
 int *arraySplitter(char *line);
 int *fileStats();
@@ -88,7 +89,10 @@ int *fileStats()
 
     return stats;
 }
-//function to create a list of all the customers, each customer contains max, allocation, and need
+
+/*
+    function to create a list of all the customers, each customer contains max, allocation, and need
+*/
 int fileToCustomer()
 {
     //create file, as of right now it will only read from sample4_in.txt
@@ -116,13 +120,13 @@ int fileToCustomer()
         customer.max = array;
         customer.allocation = malloc(sizeof(int) * 4);
         customer.need = array;
-	customer.isFinished = 0;
+        customer.isFinished = 0;
         customers[index] = customer;
         index++;
     }
     fclose(fp);
     //loop to test if the arrays were filled correctly
-/*
+    /*
     for (int i = 0; i < customerCount; i++)
     {
         for (int k = 0; k < 4; k++)
@@ -132,7 +136,10 @@ int fileToCustomer()
     }
     */
 }
-//function to turn lines read from the file into an array
+
+/*
+    function to turn lines read from the file into an array
+*/
 int *arraySplitter(char *line)
 {
     //create a copy of the input line
@@ -197,22 +204,24 @@ int *sumTwoArrays(int *array1, int *array2)
 int safety(int *available, int n, int m)
 {
     //  (step 1) -> init and set work = available
-    int isSafe = 0;                      //  true or false for if the system is safe or not
+    int isSafe = 0; //  true or false for if the system is safe or not
     int *work;
-    work = (int*)malloc(sizeof(int) * m); //  work array to be set to available array
-    int isFound = 0;                     //  true or false for if found tmp
+    work = (int *)malloc(sizeof(int) * m); //  work array to be set to available array
+    int isFound = 0;                       //  true or false for if found tmp
 
     for (int i = 0; i < m; i++) //  loop to init work array to = available
     {
 
         *(work + i) = available[i];
     }
+    //consider uncommenting if everything is broken
+    /*
     for (int i = 0; i < n; i++) //  init finish[i] to false
     {   
         customers[i].isFinished = 0;
        // printf("customers[%d].isFinished = %d", i, customers[i].isFinished);
     }
-
+    */
 
     for (int i = 0; i < n; i++) //  (step 2) -> find processes to set to true for finish[i]
     {
@@ -249,8 +258,10 @@ int safety(int *available, int n, int m)
 }
 
 //  return 0 if successful, 01 if unsuccessful
-int request(int *available, int **max, int **allocation, int **need)
+int request(int id, int *rq)
 {
+    int newAvailable[4];
+
     return 0;
 }
 
@@ -259,15 +270,90 @@ int release(int *available, int **max, int **allocation, int **need)
     return 0;
 }
 
-void status(int *available, int **max, int **allocation, int **need)
+void status(int *available, int n, int m)
 {
+    printf("\n");
+    printf("Available: ");
+    for (int i = 0; i < 4; i++)
+    {
+        printf("%d ", available[i]);
+    }
+    printf("\nMaximum: ");
+
+    for (int i = 0; i < n; i++)
+    {
+        printf("\n");
+        for (int k = 0; k < m; k++)
+        {
+            printf("%d ", customers[i].max[k]);
+        }
+    }
+    printf("\n allocation: ");
+    for (int i = 0; i < n; i++)
+    {
+        printf("\n");
+        for (int k = 0; k < m; k++)
+        {
+            printf("%d ", customers[i].allocation[k]);
+        }
+    }
+    printf("\n need: ");
+    for (int i = 0; i < n; i++)
+    {
+        printf("\n");
+        for (int k = 0; k < m; k++)
+        {
+            printf("%d ", customers[i].need[k]);
+        }
+    }
+    printf("\n");
+
     return;
+}
+
+/*
+    prints the intro when starting program
+*/
+void printIntro(int n, int m, int *available)
+{
+    printf("Number of Customers: %d\n", n);
+    printf("Currently Available resources:");
+
+    for (int i = 0; i < m; i++)
+    {
+        printf(" %d", available[i]);
+    }
+
+    printf("\nMaximum resources from file:");
+    for (int i = 0; i < n; i++)
+    {
+        printf("\n");
+        for (int k = 0; k < m; k++)
+        {
+            printf("%d ", customers[i].max[k]);
+        }
+    }
+    printf("\n");
 }
 
 int main(int argc, char *argv[])
 {
+    //make sure the user has provided argv
+    if (argc == 1)
+    {
+        printf("Available resources not given.\n");
+        return 0;
+    }
 
-    int processes[4] = {10, 5, 7,8};
+    //create processes array (available) from argv
+    int processes[argc - 1];
+
+    for (int i = 0; i < argc - 1; i++)
+    {
+        char *c;
+        int num = strtol(argv[i + 1], &c, 10);
+        processes[i] = num;
+    }
 
     //  gets number of processes (n) and number of resources (m) from sample4_in.txt
     int *stats;
@@ -275,9 +361,42 @@ int main(int argc, char *argv[])
     int n = stats[0];
     int m = stats[1];
 
-    printf("Rows = %d\nCols = %d\n", n, m);
+    printf("n = %d\nm = %d\n", n, m);
     fileToCustomer();
-    
+
+    printIntro(n, m, processes);
+
+    char line[128];
+    printf("\nEnter command: ");
+    char *command = fgets(line, 128, stdin);
+
+    char *token = strtok(command, " ");
+    while (token != NULL)
+    {
+        printf(" %s\n", token);
+        token = strtok(NULL, " ");
+    }
+
+    /*
+    while (strcmp(command, "exit") != 0)    //  compare input command to commands -> strcmp == 0 -> eqal strings
+    {
+        char *token;
+        token = strtok(command, " ");
+        if (strcmp(command, "Run") == 0)
+        {
+        }
+        else if (strcmp(command, "Status") == 0)
+        {
+        }
+        else if (strcmp(command [0:2], "RQ") == 0)
+        {
+        }
+        else if (strcmp(command, "RL") == 0)
+        {
+        }
+    }
+    */
+    status(processes, n, m);
     int isSafe = safety(processes, n, m);
     printf("System safe: %d\n", isSafe);
 }
