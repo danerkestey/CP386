@@ -58,7 +58,7 @@ int customerCount = 0;
 int *fileStats()
 {
     static int stats[2]; //  returns n and m from sample file in list type-> [n, m] || [rows, columns] || [processes, resources]
-    int n = 0;           //  number of processes (number of lines in file)
+    int n = 1;           //  number of processes (number of lines in file)
     int m = 0;           //  number of resources (number of columns in file)
     char c;              //  for storing each char read from file
 
@@ -116,12 +116,13 @@ int fileToCustomer()
         customer.max = array;
         customer.allocation = malloc(sizeof(int) * 4);
         customer.need = array;
+	customer.isFinished = 0;
         customers[index] = customer;
         index++;
     }
     fclose(fp);
     //loop to test if the arrays were filled correctly
-
+/*
     for (int i = 0; i < customerCount; i++)
     {
         for (int k = 0; k < 4; k++)
@@ -129,6 +130,7 @@ int fileToCustomer()
             printf("%d", customers[i].max[k]);
         }
     }
+    */
 }
 //function to turn lines read from the file into an array
 int *arraySplitter(char *line)
@@ -219,7 +221,7 @@ int sumArrayItems(int *array)
         return -1;
     }
 
-    for (int i = 0; i < sizeof(array); i++)
+    for (int i = 0; i < (sizeof(array) / sizeof(array[0])); i++)
     {
         sum += array[i];
     }
@@ -237,8 +239,9 @@ int sumArrayItems(int *array)
 */
 int *sumTwoArrays(int *array1, int *array2)
 {
-    int *sumArray = malloc(sizeof(int) * sizeof(array1));
-    for (int i = 0; i < sizeof(array1); i++)
+    int arrayLength = (sizeof(array1) / sizeof(int));
+    int *sumArray = malloc(sizeof(int) * arrayLength);
+    for (int i = 0; i < arrayLength; i++)
     {
         sumArray[i] = array1[i] + array2[i];
     }
@@ -249,58 +252,45 @@ int *sumTwoArrays(int *array1, int *array2)
 int safety(int *available, int n, int m)
 {
     //  (step 1) -> init and set work = available
-    printf("\ntest 1");
     int isSafe = 0;                      //  true or false for if the system is safe or not
-    int *work = malloc(sizeof(int) * m); //  work array to be set to available array
+    int *work;
+    work = (int*)malloc(sizeof(int) * m); //  work array to be set to available array
     int isFound = 0;                     //  true or false for if found tmp
 
-    printf("\ntest 2");
     for (int i = 0; i < m; i++) //  loop to init work array to = available
     {
-        printf("\ntest 2.%d", i);
-        printf("\nwork[%d] = %d", i, available[i]);
-        work[i] = available[i];
+	printf("\navailable[%d] = %d", i, available[i]);
+        *(work + i) = available[i];
+	printf("\nwork[%d] = %d", i, work[i]);
     }
-
-    printf("\ntest 3");
-
     for (int i = 0; i < n; i++) //  init finish[i] to false
-    {
-        printf("\ntest 3.%d", i);
+    {   
         customers[i].isFinished = 0;
-        printf("customers[%d].isFinished = %d", i, customers[i].isFinished);
+       // printf("customers[%d].isFinished = %d", i, customers[i].isFinished);
     }
 
-    printf("\ntest 4");
+
     for (int i = 0; i < n; i++) //  (step 2) -> find processes to set to true for finish[i]
     {
-        printf("\ntest 5");
         struct customer c_process = customers[i];
 
-        printf("\ntest 6");
         //  sum of need[i] array and work array to be used for if statement
         int needSum = sumArrayItems(c_process.need);
         int workSum = sumArrayItems(work);
 
-        printf("\ntest 7");
         if (c_process.isFinished == 0 && (needSum <= workSum)) //  (step 3) if the customer process in the customer array is false and need[i] <= work
         {
-            printf("\ntest 8");
             //  work = work + allocation[i] -> finish[i] = true (1)
             work = sumTwoArrays(work, c_process.allocation);
-            printf("\ntest 9");
             c_process.isFinished = 1; //  customer process set to true
             customers[i] = c_process;
-            printf("\ntest 10");
         }
     }
 
-    printf("\ntest 11");
     int x = 0;
 
     while (x < n) //  (step 4) finalize and verify all finsih[i] == true and set isSafe to either safe state or not safe
     {
-        printf("\ntest 12");
         if (customers[x].isFinished == 1) //  if customer struct in the customer resource array == true -> j++
         {
             x++;
@@ -308,11 +298,9 @@ int safety(int *available, int n, int m)
 
         if (x == n - 1)
         {
-            printf("\ntest 13");
             return 1; //  the system is in a safe state
         }
     }
-    printf("\ntest 14");
     return isSafe; //  return final 0 or 1 depending on safe state
 }
 
@@ -336,11 +324,10 @@ int main(int argc, char *argv[])
 {
 
     int processes[4] = {10, 5, 7, 8};
-    printf("%d", processes[0]);
 
     int available[argc - 1];
     // create a 2D array for available, max, and need
-
+/*
     int allocation[n][m];
     int max[n][m];
     int need[n][m];
@@ -355,7 +342,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    /*  DO NOT USE THIS PIECE OF SHIT
+      DO NOT USE THIS PIECE OF SHIT
     for (int i = 0; i < argc; i++)
     {
         char *c;
@@ -371,12 +358,8 @@ int main(int argc, char *argv[])
     int m = stats[1];
 
     printf("\nRows = %d\nCols = %d", n, m);
-
-    // fileToCustomer();
-    printf("\n");
-    // int isSafe = safetyAlgorithm(available, max, allocation, need, n, m);
-    printf("sys maybe safe\n");
-
+    fileToCustomer();
+    
     int isSafe = safety(processes, n, m);
-    printf("System safe: %d", isSafe);
+    printf("\nSystem safe: %d", isSafe);
 }
