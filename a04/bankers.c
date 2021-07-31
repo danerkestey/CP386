@@ -27,7 +27,7 @@ typedef struct customer
     int isFinished;
 } customer;
 
-int safetyAlgorithm(int *available, int **max, int **allocation, int **need, int n, int m);
+int safety(int *available, int n, int m);
 int request(int *available, int **max, int **allocation, int **need);
 int release(int *available, int **max, int **allocation, int **need);
 void status(int *available, int **max, int **allocation, int **need);
@@ -166,7 +166,7 @@ int sumArrayItems(int *array)
         return -1;
     }
 
-    for (int i = 0; i < (sizeof(array) / sizeof(array[0])); i++)
+    for (int i = 0; i < (sizeof(array) / sizeof(int)); i++)
     {
         sum += array[i];
     }
@@ -275,9 +275,9 @@ int main(int argc, char *argv[])
     int n = stats[0];
     int m = stats[1];
 
-    printf("\nRows = %d\nCols = %d", n, m);
+    printf("Rows = %d\nCols = %d\n", n, m);
     fileToCustomer();
     
     int isSafe = safety(processes, n, m);
-    printf("\nSystem safe: %d", isSafe);
+    printf("System safe: %d\n", isSafe);
 }
