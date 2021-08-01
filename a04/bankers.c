@@ -36,7 +36,7 @@ int isdigit();
 int *arraySplitter(char *line);
 int *fileStats();
 int lineLength(char *line);
-int compareArrays(int *need, int *work);
+int compareArrays(int *array1, int *array2);
 int n; //   number of processes
 int m; //   number of resources
 struct customer *customers;
@@ -257,41 +257,23 @@ int safety(int *available, int n, int m)
     }
     return isSafe; //  return final 0 or 1 depending on safe state
 }
-//function to compare work and need arrays for safety alg
-int compareArrays(int *need, int *work){
-	int valid = 1;
-	for(int i = 0; i < 4; i++){
-		if(need[i] > work[i]){
-			valid = 0;
-		}
-	}
-	return valid;
-}
 //  return 1 if successful, 0 if unsuccessful
 int request(int id, int *rq)
-{       // for each kind of process
-	for(int i = 0; i < 4; i ++){
-		//if the request is less than the need 
-		if(rq[i] <= customers[id].need[i]){
-			if(rq[i] <= available[i]){
+{      
 
-				//subtract the request from the available array
-				available[i] = available[i] - rq[i];
-				//add the request to the allocation array
-				customers[id].allocation[i] += rq[i];
-				//subtract the request from the need array
-				customers[id].need[i] -= rq[i];
-			} else {
-				printf("state is not safe, request will not be satisfied");
-				return 0;
-			}
-		} else {
-			// if the request is greater than the need, it will not be safe
-			printf("state is not safe, request will not be satisfied \n");
-			return 0;
+
+	if(compareArrays(rq, customers[id].need) == 1){
+		for(int i = 0; i < 4; i++){
+			available[i] -= rq[i];
+			customers[id].allocation[i] += rq[i];
+			customers[id].need[i] -= rq[i];
 		}
-	} 
-	//check if the updated variables satisfy the safety algorithm
+	}else{
+		printf("State is not safe, request will not be satisfied");
+		return 0;
+	}
+	
+	//check if the updated arrays satisfy the safety algorithm
 	int isSafe = safety(available, n, m);
 
 	if(isSafe == 1){
@@ -309,7 +291,15 @@ int request(int id, int *rq)
 	return isSafe;
 
 }
-
+int compareArrays(int *array1, int *array2){
+	int valid = 1;
+	for(int i = 0; i < 4; i++){
+		if(*(array1 + i) > *(array2 + i)){
+			valid = 0;
+		}
+	}
+	return valid;
+}
 int release(int id, int *rl)
 {
     for(int i = 0; i < 4; i++){
@@ -420,23 +410,13 @@ int main(int argc, char *argv[])
     char line[128];
     printf("\nEnter command: ");
     char *command = fgets(line, 128, stdin);
-
-
-    /*
-    while (strcmp(command, "exit") != 0)    //  compare input command to commands -> strcmp == 0 -> eqal strings
-    {
-        char *token;
-	printf("%d", strcmp(token, "exit"));
-        token = strtok(command, " ");
-        if (strcmp(token,"RQ") == 0){
-	     int rq[4] = {token[2], token[3], token[4], token[5]};
-	     request(token[1], rq);
-	}
-    }
-    */
+    printf("%d\n", strcmp("RQ", command));
+    
+    
+    
     int rq[4] = {1,1,1,1};
     request(1, rq);   
-    release(1, rq);
+    //release(1, rq);
     status(available, n, m);
     int isSafe = safety(available, n, m);
 }
