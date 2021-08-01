@@ -36,7 +36,7 @@ int isdigit();
 int *arraySplitter(char *line);
 int *fileStats();
 int lineLength(char *line);
-
+int compareArrays(int *need, int *work);
 int n; //   number of processes
 int m; //   number of resources
 struct customer *customers;
@@ -217,22 +217,21 @@ int safety(int *available, int n, int m)
         *(work + i) = available[i];
     }
     //consider uncommenting if everything is broken
-    /*
+    
     for (int i = 0; i < n; i++) //  init finish[i] to false
     {   
         customers[i].isFinished = 0;
        // printf("customers[%d].isFinished = %d", i, customers[i].isFinished);
     }
-    */
+    
 
     for (int i = 0; i < n; i++) //  (step 2) -> find processes to set to true for finish[i]
     {
         struct customer c_process = customers[i];
 
         //  sum of need[i] array and work array to be used for if statement
-        int needSum = sumArrayItems(c_process.need);
-        int workSum = sumArrayItems(work);
-
+	int workSum = sumArrayItems(work);
+	int needSum = sumArrayItems(c_process.need);
         if (c_process.isFinished == 0 && (needSum <= workSum)) //  (step 3) if the customer process in the customer array is false and need[i] <= work
         {
             //  work = work + allocation[i] -> finish[i] = true (1)
@@ -253,7 +252,7 @@ int safety(int *available, int n, int m)
 
         if (x == n - 1)
         {
-            isSafe = 1; //  the system is in a safe state
+            return 1; //  the system is in a safe state
         }
     }
     return isSafe; //  return final 0 or 1 depending on safe state
@@ -265,12 +264,18 @@ int request(int id, int *rq)
 	for(int i = 0; i < 4; i ++){
 		//if the request is less than the need 
 		if(rq[i] <= customers[id].need[i]){
-			//subtract the request from the available array
-			available[i] = available[i] - rq[i];
-			//add the request to the allocation array
-			customers[id].allocation[i] += rq[i];
-			//subtract the request from the need array
-			customers[id].need[i] -= rq[i];
+			if(rq[i] <= available[i]){
+
+				//subtract the request from the available array
+				available[i] = available[i] - rq[i];
+				//add the request to the allocation array
+				customers[id].allocation[i] += rq[i];
+				//subtract the request from the need array
+				customers[id].need[i] -= rq[i];
+			} else {
+				printf("state is not safe, request will not be satisfied");
+				return 0;
+			}
 		} else {
 			// if the request is greater than the need, it will not be safe
 			printf("state is not safe, request will not be satisfied \n");
@@ -279,6 +284,7 @@ int request(int id, int *rq)
 	} 
 	//check if the updated variables satisfy the safety algorithm
 	int isSafe = safety(available, n, m);
+
 	if(isSafe == 1){
 		printf("state is safe, request will be satisfied");
 		return 1;
@@ -299,7 +305,18 @@ int release(int *available, int **max, int **allocation, int **need)
 {
     return 0;
 }
-
+//used to compare need and work arrays in safety alg
+//returns 0 if the comparison is bad, 1 if good
+int compareArrays(int *need, int *work){
+	
+	int valid = 1;
+	for(int i = 0; i < 4; i++){
+		if(need[i] > work[i]){
+			valid = 0;
+		}
+	}
+	return valid;
+}
 void status(int *available, int n, int m)
 {   // print the available array
     printf("\n");
@@ -310,37 +327,38 @@ void status(int *available, int n, int m)
     }
     printf("\nMaximum: ");
 //print the max array
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < 5; i++)
     {
         printf("\n");
-        for (int k = 0; k < m; k++)
+        for (int k = 0; k < 4; k++)
         {
             printf("%d ", customers[i].max[k]);
         }
     }
     //print the allocation array
     printf("\n allocation: ");
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < 5; i++)
     {
         printf("\n");
-        for (int k = 0; k < m; k++)
+        for (int k = 0; k < 4; k++)
         {
             printf("%d ", customers[i].allocation[k]);
         }
     }
     //print the need array
     printf("\n need: ");
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < 5; i++)
     {
         printf("\n");
-        for (int k = 0; k < m; k++)
+        for (int k = 0; k < 4; k++)
         {
             printf("%d ", customers[i].need[k]);
         }
     }
-    printf("\n");
+   
 
     return;
+   
 }
 
 /*
@@ -390,12 +408,11 @@ int main(int argc, char *argv[])
     //  gets number of processes (n) and number of resources (m) from sample4_in.txt
     int *stats;
     stats = fileStats();
-    int n = stats[0];
-    int m = stats[1];
+    n = stats[0];
+    m = stats[1];
 
     printf("n = %d\nm = %d\n", n, m);
     fileToCustomer();
-
     printIntro(n, m, processes);
     /*
     char line[128];
@@ -429,8 +446,7 @@ int main(int argc, char *argv[])
     }
     */
     int rq[4] = {1,1,1,1};
-    request(1, rq);
-    status(processes, n, m);
-    int isSafe = safety(processes, n, m);
-    printf("System safe: %d\n", isSafe);
+    request(1, rq);   
+    status(available, n, m);
+    int isSafe = safety(available, n, m);
 }
