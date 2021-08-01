@@ -206,7 +206,7 @@ int *sumTwoArrays(int *array1, int *array2)
 int safety(int *available, int n, int m)
 {
     //  (step 1) -> init and set work = available
-    int isSafe = 0; //  true or false for if the system is safe or not
+    int isSafe = 1; //  true or false for if the system is safe or not
     int *work;
     work = (int *)malloc(sizeof(int) * m); //  work array to be set to available array
     int isFound = 0;                       //  true or false for if found tmp
@@ -250,7 +250,7 @@ int safety(int *available, int n, int m)
     int x = 0;
     for(int i= 0; i < n; i++){
 	    if(customers[i].isFinished == 0){
-		    return 0;
+		    isSafe = 0;
 	    }
     }
    
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
     //create processes array (available) from argv
     int processes[argc - 1];
-
+    
     for (int i = 0; i < argc - 1; i++)
     {
         char *c;
@@ -423,7 +423,8 @@ int main(int argc, char *argv[])
     printf("n = %d\nm = %d\n", n, m);
     fileToCustomer();
     printIntro(n, m, processes);
-    
+    //code for user input
+    //just need to tokenize string and remove \0 from the end
     char line[128];
     printf("\nEnter command: ");
     char *command = fgets(line, 128, stdin);
