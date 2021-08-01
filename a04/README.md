@@ -9,7 +9,26 @@ Banker's Algorithm, to practice the concept of deadlock avoidance.
 
 ## Installation
 
+Start by cloning the repo. After that is done, enter the following commands in a gcc compiler:
+
+gcc bankers.c -o bankers
+./bankers 10 5 7 8 [or any list of resources, in this case we are using 10 5 7 8]
+
+To exit: use command "exit" on the enter command line, or ctrl+C
+
 ## Features
+
+List of Commands:
+RQ - for requesting resources (remember threads cannot request more than maximum number of resource for that thread)
+the command would fill the allocation array. the customer would use ‘RQ’ to request for the resources for all the customers/thread
+ex: RQ 0 3 1 2 1
+
+    RL  -   for releasing resources -> ex: RL 4 1 2 3 1
+
+    Status   -   would  output  the current  stateof the available, maximum, allocation, and need arrays
+
+    Run -   find the safe sequence and run each thread
+            The command would execute the safe sequence based on the current state and all the threads would be run same function code and prints
 
 ## Tests
 
@@ -27,12 +46,18 @@ Tested with the gcc compiler (version 5.4.0) in a Linux enviroment using a sampl
 
 ## Individual Contribution (Function-wise)
 
+We used pair programming for this assignment, it is hard to pin point who did what,
+as we used LiveShare and jumped between functions alot. The individual contribution was
+50-50 and fairly split.
+
 ## Authors
 
 Daner Yasin | 190773490
 Jacob Goldman | 190509690
 
 ## Credits
+
+Chapter 8 Slides
 
 ## License
 
