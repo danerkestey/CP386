@@ -41,6 +41,8 @@ int n; //   number of processes
 int m; //   number of resources
 struct customer *customers;
 int customerCount = 0;
+int available[4] = {10, 5, 7, 8};
+
 /*
     COMMANDS:
         RQ  -   for requesting resources (remember threads cannot request more than maximum number of resource for that thread)
@@ -116,10 +118,10 @@ int fileToCustomer()
     while (fgets(line, sizeof(line), fp) != NULL)
     {
         struct customer customer;
-        int *array = arraySplitter(line);
-        customer.max = array;
+       
+        customer.max = arraySplitter(line);
         customer.allocation = malloc(sizeof(int) * 4);
-        customer.need = array;
+        customer.need = arraySplitter(line);
         customer.isFinished = 0;
         customers[index] = customer;
         index++;
@@ -257,12 +259,40 @@ int safety(int *available, int n, int m)
     return isSafe; //  return final 0 or 1 depending on safe state
 }
 
-//  return 0 if successful, 01 if unsuccessful
+//  return 1 if successful, 0 if unsuccessful
 int request(int id, int *rq)
-{
-    int newAvailable[4];
+{       // for each kind of process
+	for(int i = 0; i < 4; i ++){
+		//if the request is less than the need 
+		if(rq[i] <= customers[id].need[i]){
+			//subtract the request from the available array
+			available[i] = available[i] - rq[i];
+			//add the request to the allocation array
+			customers[id].allocation[i] += rq[i];
+			//subtract the request from the need array
+			customers[id].need[i] -= rq[i];
+		} else {
+			// if the request is greater than the need, it will not be safe
+			printf("state is not safe, request will not be satisfied \n");
+			return 0;
+		}
+	} 
+	//check if the updated variables satisfy the safety algorithm
+	int isSafe = safety(available, n, m);
+	if(isSafe == 1){
+		printf("state is safe, request will be satisfied");
+		return 1;
+	}// if the system isn't in a safe state, revert the changes to the available, allocation, and need arrays
+	else {
+		for(int i = 0; i < 4; i++){
+			available[i] += rq[i];
+			customers[id].allocation[id] -= rq[i];
+			customers[id].need[i] += rq[i];
+		}
+	}
+	//isSafe = 1 if the request was granted, otherwise the function has already returned 0 
+	return isSafe;
 
-    return 0;
 }
 
 int release(int *available, int **max, int **allocation, int **need)
@@ -271,7 +301,7 @@ int release(int *available, int **max, int **allocation, int **need)
 }
 
 void status(int *available, int n, int m)
-{
+{   // print the available array
     printf("\n");
     printf("Available: ");
     for (int i = 0; i < 4; i++)
@@ -279,7 +309,7 @@ void status(int *available, int n, int m)
         printf("%d ", available[i]);
     }
     printf("\nMaximum: ");
-
+//print the max array
     for (int i = 0; i < n; i++)
     {
         printf("\n");
@@ -288,6 +318,7 @@ void status(int *available, int n, int m)
             printf("%d ", customers[i].max[k]);
         }
     }
+    //print the allocation array
     printf("\n allocation: ");
     for (int i = 0; i < n; i++)
     {
@@ -297,6 +328,7 @@ void status(int *available, int n, int m)
             printf("%d ", customers[i].allocation[k]);
         }
     }
+    //print the need array
     printf("\n need: ");
     for (int i = 0; i < n; i++)
     {
@@ -365,7 +397,7 @@ int main(int argc, char *argv[])
     fileToCustomer();
 
     printIntro(n, m, processes);
-
+    /*
     char line[128];
     printf("\nEnter command: ");
     char *command = fgets(line, 128, stdin);
@@ -377,7 +409,7 @@ int main(int argc, char *argv[])
         token = strtok(NULL, " ");
     }
 
-    /*
+    
     while (strcmp(command, "exit") != 0)    //  compare input command to commands -> strcmp == 0 -> eqal strings
     {
         char *token;
@@ -396,6 +428,8 @@ int main(int argc, char *argv[])
         }
     }
     */
+    int rq[4] = {1,1,1,1};
+    request(1, rq);
     status(processes, n, m);
     int isSafe = safety(processes, n, m);
     printf("System safe: %d\n", isSafe);
