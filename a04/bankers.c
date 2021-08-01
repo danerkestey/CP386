@@ -224,27 +224,41 @@ int safety(int *available, int n, int m)
        // printf("customers[%d].isFinished = %d", i, customers[i].isFinished);
     }
     
-
     for (int i = 0; i < n; i++) //  (step 2) -> find processes to set to true for finish[i]
     {
         struct customer c_process = customers[i];
 
         //  sum of need[i] array and work array to be used for if statement
-	int workSum = sumArrayItems(work);
-	int needSum = sumArrayItems(c_process.need);
-        if (c_process.isFinished == 0 && (needSum <= workSum)) //  (step 3) if the customer process in the customer array is false and need[i] <= work
+	
+        int cont = 0;
+	if(compareArrays(c_process.need,work) == 1){
+		cont = 1;
+	}
+	//printf("compare arrays is: %d", compareArrays(c_process.need, work));
+        if (c_process.isFinished ==0 && cont == 1) //  (step 3) if the customer process in the customer array is false and need[i] <= work
         {
             //  work = work + allocation[i] -> finish[i] = true (1)
-            work = sumTwoArrays(work, c_process.allocation);
+	    for(int k = 0; k < 4; k++){
+		    work[k] += c_process.allocation[k];
+	    }
+            //work = sumTwoArrays(work, c_process.allocation);
             c_process.isFinished = 1; //  customer process set to true
             customers[i] = c_process;
         }
     }
 
     int x = 0;
+    for(int i= 0; i < n; i++){
+	    if(customers[i].isFinished == 0){
+		    return 0;
+	    }
+    }
+   
 
+	/*
     while (x < n) //  (step 4) finalize and verify all finsih[i] == true and set isSafe to either safe state or not safe
     {
+	    printf("huh\n");
         if (customers[x].isFinished == 1) //  if customer struct in the customer resource array == true -> j++
         {
             x++;
@@ -255,6 +269,7 @@ int safety(int *available, int n, int m)
             return 1; //  the system is in a safe state
         }
     }
+    */
     return isSafe; //  return final 0 or 1 depending on safe state
 }
 //  return 1 if successful, 0 if unsuccessful
@@ -275,15 +290,17 @@ int request(int id, int *rq)
 	
 	//check if the updated arrays satisfy the safety algorithm
 	int isSafe = safety(available, n, m);
+	printf("\n\n isSafe = %d", isSafe);
 
 	if(isSafe == 1){
 		printf("state is safe, request will be satisfied");
 		return 1;
 	}// if the system isn't in a safe state, revert the changes to the available, allocation, and need arrays
 	else {
+		printf("\n\nthis is never getting debugged\n\n");
 		for(int i = 0; i < 4; i++){
 			available[i] += rq[i];
-			customers[id].allocation[id] -= rq[i];
+			customers[id].allocation[i] -= rq[i];
 			customers[id].need[i] += rq[i];
 		}
 	}
