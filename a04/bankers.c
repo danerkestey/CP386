@@ -30,7 +30,7 @@ typedef struct customer
 
 int safety(int *available, int n, int m);
 int request(int id, int *rq);
-int release(int *available, int **max, int **allocation, int **need);
+int release(int id, int *rl);
 void status(int *available, int n, int m);
 int isdigit();
 int *arraySplitter(char *line);
@@ -257,7 +257,16 @@ int safety(int *available, int n, int m)
     }
     return isSafe; //  return final 0 or 1 depending on safe state
 }
-
+//function to compare work and need arrays for safety alg
+int compareArrays(int *need, int *work){
+	int valid = 1;
+	for(int i = 0; i < 4; i++){
+		if(need[i] > work[i]){
+			valid = 0;
+		}
+	}
+	return valid;
+}
 //  return 1 if successful, 0 if unsuccessful
 int request(int id, int *rq)
 {       // for each kind of process
@@ -301,21 +310,13 @@ int request(int id, int *rq)
 
 }
 
-int release(int *available, int **max, int **allocation, int **need)
+int release(int id, int *rl)
 {
+    for(int i = 0; i < 4; i++){
+	    available[i] += rl[i];
+	    customers[id].allocation[i] -= rl[i];
+    }  
     return 0;
-}
-//used to compare need and work arrays in safety alg
-//returns 0 if the comparison is bad, 1 if good
-int compareArrays(int *need, int *work){
-	
-	int valid = 1;
-	for(int i = 0; i < 4; i++){
-		if(need[i] > work[i]){
-			valid = 0;
-		}
-	}
-	return valid;
 }
 void status(int *available, int n, int m)
 {   // print the available array
@@ -355,6 +356,7 @@ void status(int *available, int n, int m)
             printf("%d ", customers[i].need[k]);
         }
     }
+    printf("\n");
    
 
     return;
@@ -414,39 +416,27 @@ int main(int argc, char *argv[])
     printf("n = %d\nm = %d\n", n, m);
     fileToCustomer();
     printIntro(n, m, processes);
-    /*
+    
     char line[128];
     printf("\nEnter command: ");
     char *command = fgets(line, 128, stdin);
 
-    char *token = strtok(command, " ");
-    while (token != NULL)
-    {
-        printf(" %s\n", token);
-        token = strtok(NULL, " ");
-    }
 
-    
+    /*
     while (strcmp(command, "exit") != 0)    //  compare input command to commands -> strcmp == 0 -> eqal strings
     {
         char *token;
+	printf("%d", strcmp(token, "exit"));
         token = strtok(command, " ");
-        if (strcmp(command, "Run") == 0)
-        {
-        }
-        else if (strcmp(command, "Status") == 0)
-        {
-        }
-        else if (strcmp(command [0:2], "RQ") == 0)
-        {
-        }
-        else if (strcmp(command, "RL") == 0)
-        {
-        }
+        if (strcmp(token,"RQ") == 0){
+	     int rq[4] = {token[2], token[3], token[4], token[5]};
+	     request(token[1], rq);
+	}
     }
     */
     int rq[4] = {1,1,1,1};
     request(1, rq);   
+    release(1, rq);
     status(available, n, m);
     int isSafe = safety(available, n, m);
 }
