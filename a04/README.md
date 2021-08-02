@@ -81,6 +81,7 @@ as we used LiveShare and jumped between functions alot. The individual contribut
 ## Authors
 
 Daner Yasin | 190773490
+
 Jacob Goldman | 190509690
 
 ## Credits
