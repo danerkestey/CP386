@@ -69,7 +69,7 @@ Enter command: <Exit>
 
 ## Screenshots
 
-![Alt text](./example1.jpg?raw=true "Example 1")
+![Alt text](./example.jpg?raw=true "Example 1")
 ![Alt text](./example2.jpg?raw=true "Example 2")
 
 ## Individual Contribution (Function-wise)
