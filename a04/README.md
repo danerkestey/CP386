@@ -36,11 +36,13 @@ List of Commands:
 
 Tested with the gcc compiler (version 5.4.0) in a Linux enviroment using a sample input:
 
+```
 6,4,7,3
 4,2,3,2
 2,5,3,3
 6,3,3,2
 5,6,7,5
+```
 
 ## Code Example
 
