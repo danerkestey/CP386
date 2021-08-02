@@ -19,16 +19,18 @@ To exit: use command "exit" on the enter command line, or ctrl+C
 ## Features
 
 List of Commands:
-RQ - for requesting resources (remember threads cannot request more than maximum number of resource for that thread)
-the command would fill the allocation array. the customer would use ‘RQ’ to request for the resources for all the customers/thread
-ex: RQ 0 3 1 2 1
 
-    RL  -   for releasing resources -> ex: RL 4 1 2 3 1
+    RQ      -   for requesting resources (remember threads cannot request more than maximum number of resource for that thread)
+                the command would fill the allocation array.
+                the customer would use ‘RQ’ to request for the resources for all the customers/thread
+                ex: RQ 0 3 1 2 1
 
-    Status   -   would  output  the current  stateof the available, maximum, allocation, and need arrays
+    RL      -   for releasing resources -> ex: RL 4 1 2 3 1
 
-    Run -   find the safe sequence and run each thread
-            The command would execute the safe sequence based on the current state and all the threads would be run same function code and prints
+    Status  -   would  output  the current  stateof the available, maximum, allocation, and need arrays
+
+    Run     -   find the safe sequence and run each thread
+                The command would execute the safe sequence based on the current state and all the threads would be run same function code and prints
 
 ## Tests
 
@@ -42,7 +44,31 @@ Tested with the gcc compiler (version 5.4.0) in a Linux enviroment using a sampl
 
 ## Code Example
 
+```
+C (using gcc):
+<gcc bankers.c -o bankers>
+<./bankers 10 5 7 8>
+Enter command: <RQ 1 1 1 1 1>
+-> does stuff
+// OR
+Enter command: <RL 1 1 1 1 1>
+-> does stuff
+// OR
+Enter command: <Status>
+-> does stuff
+// OR
+Enter command: <Run>
+-> does stuff
+// OR
+Enter command: <Exit>
+-> does stuff
+
+```
+
 ## Screenshots
+
+![Alt text](./example1.jpg?raw=true "Example 1")
+![Alt text](./example2.jpg?raw=true "Example 2")
 
 ## Individual Contribution (Function-wise)
 
@@ -63,7 +89,7 @@ Chapter 8 Slides
 
 MIT License
 
-Copyright (c) 2021 Daner Yasin
+Copyright (c) 2021 Daner Yasin & Jacob Goldman
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

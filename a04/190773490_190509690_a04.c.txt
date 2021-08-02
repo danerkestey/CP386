@@ -1,7 +1,7 @@
 /*
 --------------------------------------------------
 Project: CP386-assignment 4
-File:    bankers.c
+File:    190773490_190509690_a04.c.txt
 Author:  Daner Yasin     | 190773490
          Jacob Goldman   | 190509690
 Version: 2021-07-26
